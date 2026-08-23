@@ -23,6 +23,112 @@ Without a key the pipeline runs fully deterministic. Demo UI:
 streamlit run app.py
 ```
 
+## Technologies Used
+
+- **Python 3**: Core backend programming language.
+- **Pandas**: Used for robust data manipulation, CSV parsing, and tabular DataFrame management.
+- **Streamlit**: Powers the interactive web-based graphical user interface (GUI).
+- **RapidFuzz**: Provides rapid fuzzy string matching used in supplier/brand identity resolution.
+- **Google Gemini API**: Utilized for precise JSON-mode LLM content enrichment (temperature 0).
+- **SQLite**: Local caching engine to persist LLM calls, minimizing latency and API costs.
+- **Pytest**: Used for comprehensive rule-compliance validation and test assertions.
+- **OpenPyXL**: Enables reading and writing to standard `.xlsx` spreadsheet formats.
+
+## Process Flow Diagram
+
+Below is the execution pipeline for processing each row through PartForge (S0 to S9 steps):
+
+```mermaid
+graph TD
+    A[Raw Catalogue CSV] --> B[S0: Cleanse]
+    B --> C[S1: Identity Vote]
+    C --> D[S2: Classify]
+    D --> E[S3: Attributes Extract]
+    E --> F[S5: Features/Extras]
+    F --> G[S4: Descriptions Compose]
+    G --> H[S6/S7: Assets & Packaging]
+    H --> I[S8: Validate]
+    I --> J[S9: Emit Output]
+
+    J --> K[Output Delivery Format Excel/CSV]
+    J --> L[Audit Report Excel]
+
+    E -.-> |Optional LLM Request| M[Gemini API]
+    F -.-> |Optional LLM Request| M
+    M -.-> E
+    M -.-> F
+```
+
+## Architecture Diagram
+
+The system architecture demonstrating how components and external integrations interact with the core engine:
+
+```mermaid
+flowchart TD
+    subgraph Interfaces
+        UI[Streamlit Web UI / app.py]
+        CLI[Command Line Interface / main.py]
+    end
+
+    subgraph "PartForge Core Engine (src/partforge/)"
+        Engine[Pipeline Executor]
+        Modules[S0-S9 Process Modules]
+        Engine <--> Modules
+    end
+
+    subgraph Services & Storage
+        Cache[(SQLite Local Cache)]
+        Gemini[Google Gemini API]
+    end
+
+    subgraph Data
+        Input[(Raw CSV Inputs)]
+        Output[(Formatted Excel/CSV Outputs)]
+        Audit[(Audit Reports)]
+    end
+
+    UI --> Engine
+    CLI --> Engine
+    Input --> Engine
+    Engine --> Output
+    Engine --> Audit
+    Modules <--> Cache
+    Modules <--> Gemini
+```
+
+## Proposed Solution UI (Streamlit Mockup / Wireframe)
+
+A visual representation of the web interface provided by `app.py`:
+
+```text
++-----------------------------------------------------------------------------------+
+| ⚙️ PartForge — AI Product Content Enrichment                                      |
+| Raw catalogue rows → Unilog 252-column Delivery Format. Deterministic rules...    |
++-----------------------------------------------------------------------------------+
+| = Sidebar =       |  +---------------------------------------------------------+  |
+| Run settings      |  | 📂 Upload input CSV                                     |  |
+| [x] LLM (Gemini)  |  |    [ Drag and drop file here or Browse ]                |  |
+|                   |  +---------------------------------------------------------+  |
+| Parallel workers  |  | [ 🚀 Enrich ]                                           |  |
+| [=======O-------] |  +---------------------------------------------------------+  |
+| Row limit: [ 50]  |                                                               |
+|                   |  [========================================] 100%              |
+| Pipeline:         |  50/50 rows enriched                                          |
+| S0 cleanse -> S1..|  rows/s: 2.5                                                  |
+|                   |                                                               |
+|                   |  [ ✔️ Done — 50 rows in 20s · 12 flagged NEEDS_REVIEW ]       |
+|                   |                                                               |
+|                   |  +-------------------------------------+ +-----------------+  |
+|                   |  | Preview                             | | Downloads       |  |
+|                   |  | +---------------------------------+ | | [⬇️ output.xlsx]|  |
+|                   |  | | Mfg_Part | BRAND | Classpath ...| | | [⬇️ output.csv] |  |
+|                   |  | | 49-94-00 | MILW  | Tools > ...  | | | [⬇️ audit.xlsx] |  |
+|                   |  | | ...      | ...   | ...          | | |                 |  |
+|                   |  | +---------------------------------+ | +-----------------+  |
+|                   |  +-------------------------------------+                      |
++-----------------------------------------------------------------------------------+
+```
+
 ## Outputs
 
 | File | Content |
