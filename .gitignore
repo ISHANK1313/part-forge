@@ -1,0 +1,43 @@
+# ---- Protected planning docs & hackathon data (NEVER commit) ----
+PRD.md
+architecture.md
+diagrams.md
+handover-prompt.md
+handover-bugfixer.md
+handover-reviewer.md
+memory.md
+phases.md
+plan.md
+rules.md
+checklist.md
+
+# Hackathon-owned datasets
+Unihack_*.csv
+
+# ---- Secrets ----
+.env
+.streamlit/secrets.toml
+*.key
+
+# ---- Build/runtime artifacts ----
+.cache/
+out/
+out_det/
+out_llm/
+*.log
+st_log.txt
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# stray run logs
+*_log.txt
+*_err.txt
